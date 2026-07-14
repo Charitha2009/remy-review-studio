@@ -1,0 +1,22 @@
+# Node
+node_modules
+.next
+
+# Python
+venv
+__pycache__
+.pytest_cache
+
+# Env
+.env
+.env.*
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode
+.idea
+
+# Logs
+*.log

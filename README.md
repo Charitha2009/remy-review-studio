@@ -1,2 +1,25 @@
-# remy-review-studio
-AI-powered construction submittal review platform that analyzes specifications, drawings, and vendor submittals to generate compliance findings with source citations.
+# Remy Review Studio
+
+AI-powered construction submittal review platform inspired by Remy.
+
+## Tech Stack
+
+- Next.js 15
+- FastAPI
+- PostgreSQL
+- pgvector
+- Redis
+- OpenAI
+- Docker
+
+## Features
+
+- Upload project documents
+- AI-powered compliance review
+- Citation-based findings
+- Knowledge search
+- Report generation
+
+## Architecture
+
+See ARCHITECTURE.md
