@@ -8,11 +8,11 @@ import { cn } from "@/lib/utils";
 const workspaceTabs = [
   { label: "Overview", segment: "overview" },
   { label: "Documents", segment: "documents" },
-  { label: "AI Review", segment: "reviews" },
-  { label: "Exports", segment: "exports" },
+  { label: "Reviews", segment: "reviews" },
+  { label: "Reports", segment: "reports" },
 ] as const;
 
-export function WorkspaceTabNav({ projectId }: { projectId: string }) {
+export function WorkspaceTabs({ projectId }: { projectId: string }) {
   const pathname = usePathname();
 
   return (

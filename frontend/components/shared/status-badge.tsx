@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-type StatusTone = "neutral" | "warning" | "danger" | "success";
+export type StatusTone = "neutral" | "warning" | "danger" | "success";
 
 type StatusBadgeProps = {
   icon: LucideIcon;
