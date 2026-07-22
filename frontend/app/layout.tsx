@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 import { AppShell } from "@/components/layout/app-shell";
@@ -41,6 +42,7 @@ export default function RootLayout({
         <QueryProvider>
           <TooltipProvider>
             <AppShell>{children}</AppShell>
+            <Toaster richColors theme="system" position="top-right" />
           </TooltipProvider>
         </QueryProvider>
       </body>

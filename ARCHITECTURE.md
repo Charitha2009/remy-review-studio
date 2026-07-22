@@ -108,6 +108,8 @@ This keeps API endpoints within the NFR-P6 latency target (≤ 500ms P95, exclud
 
 A single PostgreSQL instance with the `pgvector` extension serves both relational and vector-search needs — there is no separate vector database. Rationale: at MVP scale (PRD NFR-SC3: 100K chunks per project), pgvector's performance is sufficient, and one database means one transactional boundary, one backup story, and one place to enforce project-scoped access control. Revisit only if `pgvector` query latency becomes a measured bottleneck (PRD Technical Risks) — see [docs/adr/](./docs/adr/) for the decision record if/when that happens.
 
+This is the target. The current implementation runs on SQLite behind the same repository layer, deferred until Sprint 3 actually needs `pgvector` — see [ADR-0002](./docs/adr/0002-sqlite-for-mvp-backend.md) for why and for the migration path.
+
 Core entities and their relationships:
 
 ```
