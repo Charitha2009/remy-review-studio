@@ -1,15 +1,36 @@
-import { ClipboardCheck } from "lucide-react";
+import { Plus } from "lucide-react";
 
-import { PagePlaceholder } from "@/components/layout/page-placeholder";
+import { PageHeader } from "@/components/shared/page-header";
+import { ReviewDialog } from "@/components/reviews/review-dialog";
+import { ReviewList } from "@/components/reviews/review-list";
+import { Button } from "@/components/ui/button";
+import { getProjectReviews } from "@/lib/placeholder-reviews";
 
-export default function ProjectReviewsPage() {
+export default async function ProjectReviewsPage({
+  params,
+}: {
+  params: Promise<{ projectId: string }>;
+}) {
+  const { projectId } = await params;
+  const reviews = getProjectReviews(projectId);
+
   return (
-    <PagePlaceholder
-      title="AI Review"
-      description="Run AI-assisted compliance reviews against vendor submittals."
-      emptyIcon={ClipboardCheck}
-      emptyTitle="No reviews yet"
-      emptyDescription="Run a compliance review on a submittal to see AI-assisted findings here."
-    />
+    <div className="space-y-6">
+      <PageHeader
+        title="Review Sessions"
+        description="Manage compliance reviews for project documents."
+        action={
+          <ReviewDialog
+            trigger={
+              <Button>
+                <Plus aria-hidden="true" />
+                New Review
+              </Button>
+            }
+          />
+        }
+      />
+      <ReviewList reviews={reviews} />
+    </div>
   );
 }

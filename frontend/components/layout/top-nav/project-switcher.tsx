@@ -1,18 +1,33 @@
+"use client";
+
 import Link from "next/link";
-import { ChevronsUpDown, FolderKanban } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Check, ChevronsUpDown, FolderKanban } from "lucide-react";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
   DropdownMenuLinkItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { buttonVariants } from "@/components/ui/button-variants";
-import { EmptyState } from "@/components/shared/empty-state";
+import { placeholderProjects } from "@/lib/placeholder-projects";
 import { cn } from "@/lib/utils";
 
-/** Placeholder switcher; real project data lands with the Project Dashboard work (FR-2). */
+function currentProjectId(pathname: string): string | null {
+  const match = /^\/projects\/([^/]+)/.exec(pathname);
+  return match ? match[1] : null;
+}
+
+/** Static placeholder projects — no backend, no persistence (see lib/placeholder-projects.ts). */
 export function ProjectSwitcher() {
+  const pathname = usePathname();
+  const activeId = currentProjectId(pathname);
+  const activeProject = placeholderProjects.find((p) => p.id === activeId);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -24,29 +39,43 @@ export function ProjectSwitcher() {
       >
         <span className="flex min-w-0 items-center gap-2">
           <FolderKanban className="size-4 shrink-0" aria-hidden="true" />
-          <span className="truncate">No project selected</span>
+          <span
+            className={cn("truncate", activeProject && "text-foreground")}
+          >
+            {activeProject ? activeProject.name : "No project selected"}
+          </span>
         </span>
         <ChevronsUpDown
           className="size-3.5 shrink-0 opacity-60"
           aria-hidden="true"
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-72 p-0">
-        <EmptyState
-          compact
-          icon={FolderKanban}
-          title="No projects yet"
-          description="Create a project to start reviewing submittals."
-          action={
+      <DropdownMenuContent align="start" className="w-64">
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Projects</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {placeholderProjects.map((project) => (
             <DropdownMenuLinkItem
+              key={project.id}
               closeOnClick
-              render={<Link href="/projects" />}
-              className="mt-1 w-auto justify-center bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              render={<Link href={`/projects/${project.id}`} />}
             >
-              Go to Projects
+              <FolderKanban className="size-4 shrink-0" aria-hidden="true" />
+              <span className="truncate">{project.name}</span>
+              {project.id === activeId ? (
+                <Check className="ml-auto size-4 shrink-0" aria-hidden="true" />
+              ) : null}
             </DropdownMenuLinkItem>
-          }
-        />
+          ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuLinkItem
+            closeOnClick
+            render={<Link href="/projects" />}
+            className="text-muted-foreground"
+          >
+            Browse all projects
+          </DropdownMenuLinkItem>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

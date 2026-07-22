@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
+import { notFound } from "next/navigation";
 
 import { WorkspaceHeader } from "@/components/workspace/workspace-header";
-import { WorkspaceTabNav } from "@/components/workspace/workspace-tab-nav";
+import { WorkspaceTabs } from "@/components/workspace/workspace-tabs";
+import { getPlaceholderProject } from "@/lib/placeholder-projects";
 
 export default async function ProjectWorkspaceLayout({
   children,
@@ -11,12 +13,17 @@ export default async function ProjectWorkspaceLayout({
   params: Promise<{ projectId: string }>;
 }) {
   const { projectId } = await params;
+  const project = getPlaceholderProject(projectId);
+
+  if (!project) {
+    notFound();
+  }
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="space-y-3">
-        <WorkspaceHeader />
-        <WorkspaceTabNav projectId={projectId} />
+      <div className="space-y-5">
+        <WorkspaceHeader project={project} />
+        <WorkspaceTabs projectId={projectId} />
       </div>
       {children}
     </div>
