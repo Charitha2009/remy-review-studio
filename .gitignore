@@ -6,6 +6,12 @@ node_modules
 venv
 __pycache__
 .pytest_cache
+.ruff_cache
+
+# Backend runtime data
+backend/uploads/
+backend/*.db
+backend/*.sqlite3
 
 # Env
 .env
