@@ -20,3 +20,11 @@ class ValidationError(AppError):
 
 class PayloadTooLargeError(AppError):
     """The uploaded file exceeds the configured size limit."""
+
+
+class UnsupportedMediaTypeError(AppError):
+    """The uploaded file's extension or declared content type isn't supported."""
+
+
+class StorageUnavailableError(AppError):
+    """A storage-layer operation failed unexpectedly (missing object, I/O error)."""

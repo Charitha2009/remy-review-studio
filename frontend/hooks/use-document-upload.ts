@@ -16,18 +16,17 @@ export type UploadQueueItem = {
   errorMessage?: string;
 };
 
+// MVP scope is PDF-only (matches the backend's file_validation.py restriction).
 const ACCEPTED_FILE_TYPES = {
   "application/pdf": [".pdf"],
-  "application/msword": [".doc"],
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
 };
 
-const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024;
+const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
 
 function describeRejection(rejection: FileRejection): string {
   const code = rejection.errors[0]?.code;
-  if (code === "file-too-large") return "File exceeds the 25 MB limit";
-  if (code === "file-invalid-type") return "Only PDF, DOC, and DOCX files are supported";
+  if (code === "file-too-large") return "File exceeds the 50 MB limit";
+  if (code === "file-invalid-type") return "Only PDF files are supported";
   return rejection.errors[0]?.message ?? "File was rejected";
 }
 

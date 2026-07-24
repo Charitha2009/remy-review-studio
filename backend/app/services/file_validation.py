@@ -1,15 +1,11 @@
-from app.core.exceptions import ValidationError
+from app.core.exceptions import UnsupportedMediaTypeError, ValidationError
 
-# Magic-byte signatures — validated in addition to the extension so a renamed
-# file can't slip past the extension check (ENGINEERING.md Security Standards:
-# "File uploads are validated by content, not just extension").
-_SIGNATURES: dict[str, tuple[bytes, ...]] = {
-    ".pdf": (b"%PDF-",),
-    ".docx": (b"PK\x03\x04", b"PK\x05\x06"),
-    ".doc": (b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1",),
-}
-
-ALLOWED_EXTENSIONS = tuple(_SIGNATURES)
+# MVP scope is PDF-only (PRODUCT_SPEC.md §6 non-goals: "MVP is document-based
+# (PDF) only") — the ingestion pipeline this milestone prepares documents for
+# only ever parses PDFs.
+PDF_EXTENSION = ".pdf"
+PDF_SIGNATURE = b"%PDF-"
+ALLOWED_CONTENT_TYPES = ("application/pdf",)
 
 
 def extension_of(filename: str) -> str:
@@ -17,19 +13,35 @@ def extension_of(filename: str) -> str:
     return filename[dot_index:].lower() if dot_index != -1 else ""
 
 
-def validate_upload(filename: str, content: bytes) -> str:
-    """Validates extension + content signature; returns the (lowercased) extension."""
+def validate_upload(filename: str, content: bytes, content_type: str | None) -> str:
+    """
+    Validates presence, extension, declared content type, emptiness, and PDF
+    magic-byte signature. Returns the (lowercased) extension on success.
+
+    Extension/content-type mismatches are "unsupported media type" (415) —
+    the caller asked for something this API doesn't handle. Missing filename,
+    empty content, and a bad signature despite a `.pdf` name/type are
+    "malformed or empty upload" (400) — the request claimed to be a PDF but
+    isn't a usable one.
+    """
+    if not filename or not filename.strip():
+        raise ValidationError("A filename is required.")
+
     extension = extension_of(filename)
-    if extension not in ALLOWED_EXTENSIONS:
-        raise ValidationError(
-            f"Unsupported file type '{extension or filename}'. "
-            f"Only PDF, DOC, and DOCX files are supported."
+    if extension != PDF_EXTENSION:
+        raise UnsupportedMediaTypeError(
+            f"Unsupported file type '{extension or filename}'. Only PDF files are supported."
         )
 
-    signatures = _SIGNATURES[extension]
-    if not content.startswith(signatures):
-        raise ValidationError(
-            f"'{filename}' does not look like a valid {extension.lstrip('.').upper()} file."
+    if content_type and content_type not in ALLOWED_CONTENT_TYPES:
+        raise UnsupportedMediaTypeError(
+            f"Unsupported content type '{content_type}'. Only PDF files are supported."
         )
+
+    if len(content) == 0:
+        raise ValidationError(f"'{filename}' is empty.")
+
+    if not content.startswith(PDF_SIGNATURE):
+        raise ValidationError(f"'{filename}' does not look like a valid PDF file.")
 
     return extension

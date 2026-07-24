@@ -8,6 +8,8 @@ from app.core.exceptions import (
     ConflictError,
     NotFoundError,
     PayloadTooLargeError,
+    StorageUnavailableError,
+    UnsupportedMediaTypeError,
     ValidationError,
 )
 
@@ -16,6 +18,8 @@ _STATUS_BY_ERROR: dict[type[AppError], int] = {
     ConflictError: status.HTTP_409_CONFLICT,
     ValidationError: status.HTTP_400_BAD_REQUEST,
     PayloadTooLargeError: status.HTTP_413_CONTENT_TOO_LARGE,
+    UnsupportedMediaTypeError: status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+    StorageUnavailableError: status.HTTP_500_INTERNAL_SERVER_ERROR,
 }
 
 

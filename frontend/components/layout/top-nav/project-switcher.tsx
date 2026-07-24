@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Check, ChevronsUpDown, FolderKanban } from "lucide-react";
+import { Check, ChevronsUpDown, FolderKanban, LoaderCircle, TriangleAlert } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -14,7 +14,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { buttonVariants } from "@/components/ui/button-variants";
-import { placeholderProjects } from "@/lib/placeholder-projects";
+import { EmptyState } from "@/components/shared/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useProjects } from "@/hooks/use-projects";
 import { cn } from "@/lib/utils";
 
 function currentProjectId(pathname: string): string | null {
@@ -22,11 +24,17 @@ function currentProjectId(pathname: string): string | null {
   return match ? match[1] : null;
 }
 
-/** Static placeholder projects — no backend, no persistence (see lib/placeholder-projects.ts). */
 export function ProjectSwitcher() {
   const pathname = usePathname();
   const activeId = currentProjectId(pathname);
-  const activeProject = placeholderProjects.find((p) => p.id === activeId);
+  const { data: projects, isLoading, isError, refetch } = useProjects();
+
+  const activeProject = projects?.find((project) => project.id === activeId);
+  const triggerLabel = isLoading
+    ? "Loading projects…"
+    : isError
+      ? "Projects unavailable"
+      : (activeProject?.name ?? "No project selected");
 
   return (
     <DropdownMenu>
@@ -38,35 +46,65 @@ export function ProjectSwitcher() {
         )}
       >
         <span className="flex min-w-0 items-center gap-2">
-          <FolderKanban className="size-4 shrink-0" aria-hidden="true" />
-          <span
-            className={cn("truncate", activeProject && "text-foreground")}
-          >
-            {activeProject ? activeProject.name : "No project selected"}
+          {isLoading ? (
+            <LoaderCircle className="size-4 shrink-0 animate-spin" aria-hidden="true" />
+          ) : (
+            <FolderKanban className="size-4 shrink-0" aria-hidden="true" />
+          )}
+          <span className={cn("truncate", activeProject && "text-foreground")}>
+            {triggerLabel}
           </span>
         </span>
-        <ChevronsUpDown
-          className="size-3.5 shrink-0 opacity-60"
-          aria-hidden="true"
-        />
+        <ChevronsUpDown className="size-3.5 shrink-0 opacity-60" aria-hidden="true" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-64">
         <DropdownMenuGroup>
           <DropdownMenuLabel>Projects</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {placeholderProjects.map((project) => (
-            <DropdownMenuLinkItem
-              key={project.id}
-              closeOnClick
-              render={<Link href={`/projects/${project.id}`} />}
-            >
-              <FolderKanban className="size-4 shrink-0" aria-hidden="true" />
-              <span className="truncate">{project.name}</span>
-              {project.id === activeId ? (
-                <Check className="ml-auto size-4 shrink-0" aria-hidden="true" />
-              ) : null}
-            </DropdownMenuLinkItem>
-          ))}
+          {isLoading ? (
+            <div className="space-y-1 px-2 py-1.5" aria-hidden="true">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+            </div>
+          ) : isError ? (
+            <EmptyState
+              compact
+              icon={TriangleAlert}
+              title="Couldn't load projects"
+              description="Check your connection and try again."
+              action={
+                <button
+                  type="button"
+                  onClick={() => refetch()}
+                  className="text-xs font-medium text-foreground underline underline-offset-2"
+                >
+                  Retry
+                </button>
+              }
+            />
+          ) : projects && projects.length > 0 ? (
+            projects.map((project) => (
+              <DropdownMenuLinkItem
+                key={project.id}
+                closeOnClick
+                render={<Link href={`/projects/${project.id}`} />}
+              >
+                <FolderKanban className="size-4 shrink-0" aria-hidden="true" />
+                <span className="truncate">{project.name}</span>
+                {project.id === activeId ? (
+                  <Check className="ml-auto size-4 shrink-0" aria-hidden="true" />
+                ) : null}
+              </DropdownMenuLinkItem>
+            ))
+          ) : (
+            <EmptyState
+              compact
+              icon={FolderKanban}
+              title="No projects yet"
+              description="Create a project to get started."
+            />
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuLinkItem
             closeOnClick

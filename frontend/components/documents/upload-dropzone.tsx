@@ -71,7 +71,7 @@ export function UploadDropzone({
           <p className="text-sm font-medium text-foreground">
             Drag and drop files, or browse
           </p>
-          <p className="text-xs text-muted-foreground">PDF, DOC, and DOCX files up to 25&nbsp;MB</p>
+          <p className="text-xs text-muted-foreground">PDF files up to 50&nbsp;MB</p>
         </div>
         <Button type="button" variant="outline" size="sm" onClick={open}>
           Browse Files
