@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { fetchProjectDocuments, uploadProjectDocument } from "@/lib/documents-api";
+import { downloadProjectDocument, fetchProjectDocuments, uploadProjectDocument } from "@/lib/documents-api";
 import type { DocumentType, ProjectDocument } from "@/types/document";
 
 export function documentsQueryKey(projectId: string) {
@@ -34,5 +34,20 @@ export function useUploadDocument(projectId: string) {
         previous ? [document, ...previous] : [document]
       );
     },
+  });
+}
+
+type DownloadVariables = {
+  documentId: string;
+  filename: string;
+};
+
+/** Fetches the document as a blob and returns it alongside the filename it should be saved as — the caller triggers the actual browser save. */
+export function useDownloadDocument() {
+  return useMutation<{ blob: Blob; filename: string }, unknown, DownloadVariables>({
+    mutationFn: async ({ documentId, filename }) => ({
+      blob: await downloadProjectDocument(documentId),
+      filename,
+    }),
   });
 }

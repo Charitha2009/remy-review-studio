@@ -30,3 +30,10 @@ export async function uploadProjectDocument(
   );
   return response.data;
 }
+
+export async function downloadProjectDocument(documentId: string): Promise<Blob> {
+  const response = await apiClient.get<Blob>(`/api/v1/documents/${documentId}/download`, {
+    responseType: "blob",
+  });
+  return response.data;
+}

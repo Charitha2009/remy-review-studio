@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import BinaryIO
 
 from app.storage.base import StorageBackend
 
@@ -20,6 +21,9 @@ class LocalStorageBackend(StorageBackend):
 
     def exists(self, key: str) -> bool:
         return self._resolve(key).exists()
+
+    def open(self, key: str) -> BinaryIO:
+        return self._resolve(key).open("rb")
 
     def _resolve(self, key: str) -> Path:
         path = (self.root / key).resolve()

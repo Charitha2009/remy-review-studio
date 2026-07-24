@@ -1,3 +1,5 @@
+from typing import BinaryIO
+
 from app.storage.base import StorageBackend
 
 
@@ -21,3 +23,9 @@ class StorageService:
 
     def delete_document_file(self, key: str) -> None:
         self.backend.delete(key)
+
+    def document_file_exists(self, key: str) -> bool:
+        return self.backend.exists(key)
+
+    def open_document_file(self, key: str) -> BinaryIO:
+        return self.backend.open(key)
