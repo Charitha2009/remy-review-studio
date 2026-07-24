@@ -11,7 +11,8 @@ export type Project = {
   status: ProjectStatus;
   createdAt: string;
   updatedAt: string;
-  archivedAt: string | null;
+  /** Not yet returned by the backend (no archive endpoint exists — ADR pending); optional so real API responses satisfy this type without fabricating a value. */
+  archivedAt?: string | null;
 };
 
 /** What the Projects List and Workspace Overview actually render. */
